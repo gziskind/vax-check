@@ -22,7 +22,7 @@ function checkCvs() {
     })
 
     if(available.length > 0) {
-      var message = 'CVS Appointments:' + CR
+      var message = 'CVS Appointments: (https://www.cvs.com/vaccine/intake/store/eligibility-screener/not-eligible)' + CR
       available.forEach(function(location) {
         message += " * " + location['city'] + ": " + location['status'] + CR
       })
@@ -87,7 +87,7 @@ function checkWalgreens() {
 
   request.post(options, function(error, response, body) {
     if(body['appointmentsAvailable']) {
-      var message = 'Walgreens Appointments:' + CR
+      var message = 'Walgreens Appointments: (https://www.walgreens.com/findcare/vaccination/covid-19/location-screening)' + CR
       message += " * " + body['zipCode'] + CR
 
       sendTelegramMessage(message)
