@@ -1,6 +1,6 @@
 var config = {
-	botId:"TELEGRAM_BOT_ID",
-	chatId:"TELEGRAM_CHAT_ID"
+  botId:"TELEGRAM_BOT_ID",
+  chatId:"TELEGRAM_CHAT_ID"
 }
 
 module.exports = config
