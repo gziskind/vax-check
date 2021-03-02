@@ -24,7 +24,7 @@ function checkCvs() {
     if(available.length > 0) {
       var message = 'CVS Appointments:' + CR
       available.forEach(function(location) {
-        message += location['city'] + ": " + location['status'] + CR
+        message += " * " + location['city'] + ": " + location['status'] + CR
       })
 
       sendTelegramMessage(message)
