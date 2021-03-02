@@ -75,8 +75,8 @@ function checkWalgreens() {
     json:{
       "serviceId":"99",
       "position":{
-        "latitude":39.4452108,
-        "longitude":-76.6528225
+        "latitude":38.9875145,
+        "longitude":-77.0737149
       },
       "appointmentAvailability":{
         "startDateTime":"2021-03-02"
