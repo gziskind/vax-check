@@ -56,7 +56,7 @@ function checkSixFlags() {
     })
 
     if(available.length > 0) {
-      var message = 'Six Flags Appointments:' + CR
+      var message = 'Six Flags Appointments: (https://massvax.maryland.gov)' + CR
       available.forEach(function(date) {
         message += " * Available on " + date + CR
       })
