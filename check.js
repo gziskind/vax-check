@@ -1,4 +1,5 @@
 var request = require('request')
+var dateformat = require('dateformat')
 
 var config = require('./config')
 
@@ -16,7 +17,7 @@ function checkCvs() {
     var locations = JSON.parse(body)['responsePayloadData']['data']['MD']
     var available = []
     locations.forEach(function(location) {
-      if(location['status'] != "Fully Booked"){
+      if(location['status'] != "Fully Booked" && !config.cityExcludes.includes(location['city'])){
         available.push(location)
       }
     })
@@ -33,14 +34,19 @@ function checkCvs() {
 }
 
 function checkSixFlags() {
+  var today = new Date()
+  today.setDate(today.getDate() + 1)
+  var end = new Date()
+  end.setMonth(today.getMonth()+1);
+
   var options = {
     url: "https://api-massvax.maryland.gov/public/locations/a0Z3d000000HCTiEAO/availability",
     headers:{
       "Content-type":"application/json;charset=UTF-8"
     },
     json:{
-      "startDate":"2021-03-01",
-      "endDate":"2021-03-31",
+      "startDate":dateformat(today,"yyyy-mm-dd"),
+      "endDate":dateformat(end,"yyyy-mm-dd"),
       "vaccineData":"WyJhMVYzZDAwMDAwMDAyMmdFQUEiXQ==",
       "doseNumber":1,
       "url":"https://massvax.maryland.gov/appointment-select"

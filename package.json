@@ -4,6 +4,7 @@
   "description": "",
   "main": "check.js",
   "dependencies": {
+    "dateformat": "^4.5.1",
     "request": "^2.88.2"
   },
   "devDependencies": {},
