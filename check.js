@@ -1,5 +1,7 @@
 var request = require('request')
 var dateformat = require('dateformat')
+var fs = require('fs')
+var path = require('path')
 
 var config = require('./config')
 
@@ -22,13 +24,21 @@ function checkCvs() {
       }
     })
 
+    var file = getStatusFile(".cvs-message")
+    var previousMessage = getPreviousMessage(file)
+
     if(available.length > 0) {
       var message = 'CVS Appointments: (https://www.cvs.com/vaccine/intake/store/eligibility-screener/not-eligible)' + CR
       available.forEach(function(location) {
         message += " * " + location['city'] + ": " + location['status'] + CR
       })
 
-      sendTelegramMessage(message)
+      if(message != previousMessage) {
+        fs.writeFileSync(file, message)
+        sendTelegramMessage(message)
+      }
+    } else {
+      fs.writeFileSync(file,"")
     }
   })
 }
@@ -61,13 +71,21 @@ function checkSixFlags() {
       }
     })
 
+    var file = getStatusFile(".sixflags-message")
+    var previousMessage = getPreviousMessage(file)
+
     if(available.length > 0) {
       var message = 'Six Flags Appointments: (https://massvax.maryland.gov)' + CR
       available.forEach(function(date) {
         message += " * Available on " + date + CR
       })
 
-      sendTelegramMessage(message)
+      if(message != previousMessage) {
+        fs.writeFileSync(file, message)
+        sendTelegramMessage(message)
+      }
+    } else {
+      fs.writeFileSync(file,"")
     }
   })
 }
@@ -92,13 +110,34 @@ function checkWalgreens() {
   }
 
   request.post(options, function(error, response, body) {
+    var file = getStatusFile(".walgreens-message")
+    var previousMessage = getPreviousMessage(file)
+
     if(body['appointmentsAvailable']) {
       var message = 'Walgreens Appointments: (https://www.walgreens.com/findcare/vaccination/covid-19/location-screening)' + CR
       message += " * " + body['zipCode'] + CR
 
-      sendTelegramMessage(message)
+      if(message != previousMessage) {
+        fs.writeFileSync(file, message)
+        sendTelegramMessage(message)
+      }
+    } else {
+      fs.writeFileSync(file,"")
     }
   })
+}
+
+function getStatusFile(filename) {
+  return path.join(__dirname, filename)
+}
+
+function getPreviousMessage(file) {
+  var previousMessage = ""
+  if(fs.existsSync(file)) {
+    previousMessage = fs.readFileSync(file).toString()
+  }
+
+  return previousMessage
 }
 
 function sendTelegramMessage(message) {
