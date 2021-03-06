@@ -19,7 +19,7 @@ function checkCvs() {
     var locations = JSON.parse(body)['responsePayloadData']['data']['MD']
     var available = []
     locations.forEach(function(location) {
-      if(location['status'] == "Fully Booked" && !config.cityExcludes.includes(location['city'])){
+      if(location['status'] != "Fully Booked" && !config.cityExcludes.includes(location['city'])){
         available.push(location)
       }
     })
