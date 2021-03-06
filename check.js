@@ -19,7 +19,7 @@ function checkCvs() {
     var locations = JSON.parse(body)['responsePayloadData']['data']['MD']
     var available = []
     locations.forEach(function(location) {
-      if(location['status'] != "Fully Booked" && !config.cityExcludes.includes(location['city'])){
+      if(location['status'] == "Fully Booked" && !config.cityExcludes.includes(location['city'])){
         available.push(location)
       }
     })
@@ -35,7 +35,7 @@ function checkCvs() {
 
       if(message != previousMessage) {
         fs.writeFileSync(file, message)
-        sendTelegramMessage(message)
+        sendTelegramMessages(message)
       }
     } else {
       fs.writeFileSync(file,"")
@@ -82,7 +82,7 @@ function checkSixFlags() {
 
       if(message != previousMessage) {
         fs.writeFileSync(file, message)
-        sendTelegramMessage(message)
+        sendTelegramMessages(message)
       }
     } else {
       fs.writeFileSync(file,"")
@@ -119,7 +119,7 @@ function checkWalgreens() {
 
       if(message != previousMessage) {
         fs.writeFileSync(file, message)
-        sendTelegramMessage(message)
+        sendTelegramMessages(message)
       }
     } else {
       fs.writeFileSync(file,"")
@@ -140,8 +140,13 @@ function getPreviousMessage(file) {
   return previousMessage
 }
 
-function sendTelegramMessage(message) {
-  var telegramBot = "https://api.telegram.org/bot" + config.botId + "/sendMessage?chat_id=" + config.chatId + "&text="
+function sendTelegramMessages(message) {
+  sendTelegramMessage(message, config.chatId)
+  sendTelegramMessage(message, config.channelId)
+}
+
+function sendTelegramMessage(message, chatId) {
+  var telegramBot = "https://api.telegram.org/bot" + config.botId + "/sendMessage?chat_id=" + chatId + "&text="
 
   telegramBot += message
   request.get(telegramBot)
