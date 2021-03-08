@@ -28,7 +28,7 @@ function checkCvs() {
     var previousMessage = getPreviousMessage(file)
 
     if(available.length > 0) {
-      var message = 'CVS Appointments: (https://www.cvs.com/vaccine/intake/store/eligibility-screener/not-eligible)' + CR
+      var message = 'CVS Appointments: (https://www.cvs.com/immunizations/covid-19-vaccine)' + CR
       available.forEach(function(location) {
         message += " * " + location['city'] + ": " + location['status'] + CR
       })
