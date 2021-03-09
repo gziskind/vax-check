@@ -50,51 +50,77 @@ function checkSixFlags() {
   end.setMonth(today.getMonth()+1);
 
   var options = {
-    url: "https://api-massvax.maryland.gov/public/locations/a0Z3d000000HCTiEAO/availability",
+    url: "https://api-massvax.maryland.gov/public/locations/search",
     headers:{
       "Content-type":"application/json;charset=UTF-8"
     },
     json:{
-      "startDate":dateformat(today,"yyyy-mm-dd"),
-      "endDate":dateformat(end,"yyyy-mm-dd"),
-      "vaccineData":"WyJhMVYzZDAwMDAwMDAyMmdFQUEiXQ==",
+      "location":{
+        "lat":39.0038878,
+        "lng":-77.1053673
+      },
+      "fromDate":dateformat(today,"yyyy-mm-dd"),
+      "vaccineData":"WyJhMVYzZDAwMDAwMDAyMmdFQUEiLCJhMVYzZDAwMDAwMDAyT0FFQVkiXQ==",
+      "locationQuery":{
+        "includePools":["default"]
+      },
       "doseNumber":1,
-      "url":"https://massvax.maryland.gov/appointment-select"
+      "url":"https://massvax.maryland.gov/location-select"
     }
   }
 
+
   request.post(options, function(error, response, body) {
-    var available = []
-    body["availability"].forEach(function(day) {
-      if(day['available']) {
-        available.push(day['date'])
+    var available = {}
+    body["locations"].forEach(function(location) {
+      var name = location['name']
+      if(location['openHours'].length > 0) {
+        location['openHours'].forEach(function(openHours) {
+          openHours['days'].forEach(function(day) {
+            if(!available[name]) {
+              available[name] = []
+            } 
+            available[name].push(day)
+          })
+        })
       }
     })
 
     var file = getStatusFile(".sixflags-message")
     var previousMessage = getPreviousMessage(file)
 
-    if(available.length > 0) {
-      var message = 'Six Flags Appointments: (https://massvax.maryland.gov)' + CR
-      available.forEach(function(date) {
-        message += " * Available on " + date + CR
-      })
+    var keys = Object.keys(available)
 
-      if(message != previousMessage) {
-        fs.writeFileSync(file, message)
-        sendTelegramMessages(message)
-      }
-    } else {
+    var message = ''
+    keys.forEach(function(key) {
+      message += key + ' Appointments: (https://massvax.maryland.gov)' + CR
+      available[key].forEach(function(day) {
+        message += " * Available on " + day + CR
+      })
+    })
+
+    if(message != previousMessage) {
+      fs.writeFileSync(file, message)
+      sendTelegramMessages(message)
+    }
+
+    if(keys.length === 0) {
       fs.writeFileSync(file,"")
     }
   })
 }
 
 function checkWalgreens() {
+  var today = new Date()
+  today.setDate(today.getDate() + 1)
+
   var options = {
     url: "https://www.walgreens.com/hcschedulersvc/svc/v1/immunizationLocations/availability",
     headers:{
-      "Content-type":"application/json;charset=UTF-8"
+      "Content-type":"application/json;charset=UTF-8",
+      "origin": "https://www.walgreens.com",
+      "x-xsrf-token": config.walgreens.headerXsrfToken,
+      "cookie": config.walgreens.cookieXsrfToken
     },
     json:{
       "serviceId":"99",
@@ -103,7 +129,7 @@ function checkWalgreens() {
         "longitude":-77.0737149
       },
       "appointmentAvailability":{
-        "startDateTime":"2021-03-02"
+        "startDateTime":dateformat(today,"yyyy-mm-dd")
       },
       "radius":25
     }
