@@ -153,6 +153,39 @@ function checkWalgreens() {
   })
 }
 
+function checkMTBank() {
+  var options = {
+    url:"https://signupandschedule.umm.edu/mychart/OpenScheduling/OpenScheduling/GetOpeningsForProvider?noCache=0.30118650554066395",
+    headers: {
+      "__RequestVerificationToken": config.mtbank.requestToken,
+      "Cookie":config.mtbank.cookieRequestToken
+    },
+    formData: {
+      id: "RES^84002860",
+      vt: "22759",
+      view: "grouped"
+    }
+  }
+
+  request.post(options, function(error, response, body) {
+    var json = JSON.parse(body);
+    var file = getStatusFile(".mt-message")
+    var previousMessage = getPreviousMessage(file)
+
+    if(Object.keys(json['AllDays']).length == 0) {
+      var message = "Check MT Bank Appts" + CR;
+
+      if(message != previousMessage) {
+        fs.writeFileSync(file, message)
+        sendTelegramMessages(message)
+      }
+    } else {
+      fs.writeFileSync(file,"")
+    }
+  })
+
+}
+
 function getStatusFile(filename) {
   return path.join(__dirname, filename)
 }
@@ -183,3 +216,4 @@ function sendTelegramMessage(message, chatId) {
 checkCvs()
 checkSixFlags()
 checkWalgreens()
+checkMTBank()
