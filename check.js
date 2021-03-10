@@ -200,10 +200,16 @@ function getPreviousMessage(file) {
 }
 
 function sendTelegramMessages(message) {
+  message = encodeMessage(message)
   sendTelegramMessage(message, config.chatId)
   if(config.production) {
     sendTelegramMessage(message, config.channelId)
   }
+}
+
+function encodeMessage(message) {
+  message = message.replace(/&/g,'and')
+  return message
 }
 
 function sendTelegramMessage(message, chatId) {
