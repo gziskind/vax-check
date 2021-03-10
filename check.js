@@ -172,7 +172,7 @@ function checkMTBank() {
     var file = getStatusFile(".mt-message")
     var previousMessage = getPreviousMessage(file)
 
-    if(Object.keys(json['AllDays']).length >= 0) {
+    if(Object.keys(json['AllDays']).length > 0) {
       var message = "Check MT Bank Appts" + CR;
 
       if(message != previousMessage) {
