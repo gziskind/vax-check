@@ -168,7 +168,9 @@ function getPreviousMessage(file) {
 
 function sendTelegramMessages(message) {
   sendTelegramMessage(message, config.chatId)
-  sendTelegramMessage(message, config.channelId)
+  if(config.production) {
+    sendTelegramMessage(message, config.channelId)
+  }
 }
 
 function sendTelegramMessage(message, chatId) {
