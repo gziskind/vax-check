@@ -167,23 +167,31 @@ function checkMTBank() {
     }
   }
 
+
   request.post(options, function(error, response, body) {
     var json = JSON.parse(body);
     var file = getStatusFile(".mt-message")
     var previousMessage = getPreviousMessage(file)
 
-    if(Object.keys(json['AllDays']).length > 0) {
-      var message = "Check MT Bank Appts" + CR;
-
-      if(message != previousMessage) {
-        fs.writeFileSync(file, message)
-        sendTelegramMessages(message)
+    var days = Object.keys(json['AllDays'])
+    if(days.length > 0) {
+      var firstKey = days[0]
+      if(json['AllDays'][firstKey] && json['AllDays'][firstKey]['Slots'] && json['AllDays'][firstKey]['Slots'].length > 0) {
+        var message = "Appointments at MT Bank likely available " + CR;
+        
+        if(message != previousMessage) {
+          fs.writeFileSync(file, message)
+          sendTelegramMessages(message)
+        } else {
+          fs.writeFileSync(file,"")
+        }
+      } else {
+        fs.writeFileSync(file,"")
       }
     } else {
       fs.writeFileSync(file,"")
     }
   })
-
 }
 
 function getStatusFile(filename) {
@@ -222,4 +230,4 @@ function sendTelegramMessage(message, chatId) {
 checkCvs()
 checkSixFlags()
 checkWalgreens()
-checkMTBank()
+// checkMTBank()
